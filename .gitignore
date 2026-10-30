@@ -1,0 +1,15 @@
+# Binarios de compilación
+bin/
+*.exp
+*.lib
+*.obj
+*.pdb
+
+# Imágenes de entrada grandes (se regeneran con scripts/preparar_imagenes.py)
+data/*.pgm
+data/img_*.png
+
+# Salidas en PGM (se conservan las versiones PNG)
+resultados/imagenes/*.pgm
+
+__pycache__/

@@ -1,0 +1,7 @@
+Imagen original: arbol.jpg (6426x6473, modo RGB)
+Conversion a gris: Pillow convert('L')  ->  L = 0.299 R + 0.587 G + 0.114 B
+Recorte cuadrado central: caja (izq, arriba, der, abajo) = (0, 23, 6426, 6449), lado = 6426 px
+Redimensionamiento: Pillow resize(..., Image.LANCZOS)
+  img_2000.pgm: 6426x6426 -> 2000x2000 (reduccion)
+  img_4000.pgm: 6426x6426 -> 4000x4000 (reduccion)
+  img_6000.pgm: 6426x6426 -> 6000x6000 (reduccion)
