@@ -1,0 +1,12 @@
+# Binarios de compilación
+bin/
+*.exp
+*.lib
+*.obj
+*.pdb
+
+
+# Salidas en PGM (se conservan las versiones PNG)
+
+
+__pycache__/

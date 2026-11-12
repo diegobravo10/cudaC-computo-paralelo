@@ -1,0 +1,3 @@
+Origen: arbol.jpg
+Recorte central: (0, 23, 6426, 6449)
+Conversión: escala de grises; redimensionamiento: LANCZOS
