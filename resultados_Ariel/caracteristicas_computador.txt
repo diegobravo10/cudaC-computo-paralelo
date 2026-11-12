@@ -1,0 +1,7 @@
+CARACTERISTICAS DEL COMPUTADOR - ARIEL
+=======================================
+
+Procesador : Intel Core i7-13620H (10 nucleos / 16 hilos, 2.40 GHz)
+RAM        : 16 GB DDR5 (2 x 8 GB Samsung, 5200 MT/s)
+Grafica    : NVIDIA GeForce RTX 4070 Laptop GPU, 8 GB GDDR6 (CUDA 13.4)
+Sistema    : Windows 11 Home 64 bits
