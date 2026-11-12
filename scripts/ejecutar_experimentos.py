@@ -1,5 +1,3 @@
-"""Ejecuta los cuatro experimentos y genera los CSV de tiempos y validación."""
-
 import argparse
 import subprocess
 import sys

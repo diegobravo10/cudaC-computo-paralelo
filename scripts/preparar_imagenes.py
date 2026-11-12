@@ -1,5 +1,3 @@
-"""Prepara una foto en gris a 2000, 4000 y 6000 píxeles, o una entrada sintética."""
-
 import argparse
 from pathlib import Path
 

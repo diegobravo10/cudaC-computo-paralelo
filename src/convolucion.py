@@ -1,5 +1,3 @@
-"""Núcleo de la práctica: referencia CPU y convolución mediante PyCUDA."""
-
 from dataclasses import dataclass
 import os
 from pathlib import Path

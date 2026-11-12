@@ -1,5 +1,3 @@
-"""Lectura/escritura de imágenes y conversión para visualización."""
-
 from pathlib import Path
 
 import numpy as np

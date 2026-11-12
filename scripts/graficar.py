@@ -1,5 +1,3 @@
-"""Genera resumen, aceleraciones y las cinco gráficas de la práctica."""
-
 import csv
 from collections import defaultdict
 from pathlib import Path
