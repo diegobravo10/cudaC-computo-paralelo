@@ -10,6 +10,6 @@ data/*.pgm
 data/img_*.png
 
 # Salidas en PGM (se conservan las versiones PNG)
-resultados/imagenes/*.pgm
+
 
 __pycache__/

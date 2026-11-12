@@ -1,0 +1,32 @@
+== Sistema ==
+SO: Windows-11-10.0.26200-SP0
+
+== CPU ==
+Name                      : Intel(R) Core(TM) Ultra 9 185H
+NumberOfCores             : 16
+NumberOfLogicalProcessors : 22
+MaxClockSpeed             : 2500
+
+== RAM ==
+31,5 GB
+
+== GPU (programa) ==
+GPU: NVIDIA GeForce RTX 4070 Laptop GPU
+Capacidad de computo: 8.9
+Multiprocesadores (SM): 36
+Memoria global: 8188 MiB
+Max hilos por bloque: 1024
+Max bloques en X: 2147483647
+CUDA runtime: 13.4, driver: 13.4
+
+== GPU (nvidia-smi) ==
+name, memory.total [MiB], driver_version
+NVIDIA GeForce RTX 4070 Laptop GPU, 8188 MiB, 617.42
+
+== Herramientas ==
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2026 NVIDIA Corporation
+Built on Sun_Sep_01_02:23:07_Pacific_Standard_Time_2026
+Cuda compilation tools, release 13.4, V13.4.92
+Build cuda_13.4.r13.4/compiler.38855100_0
+Python 3.12.0
