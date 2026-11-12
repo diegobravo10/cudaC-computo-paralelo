@@ -1,0 +1,23 @@
+﻿SISTEMA
+- Sistema operativo: Microsoft Windows 11 Home (10.0.26300, 64 bits)
+- Versión de Windows: 2009
+
+PROCESADOR (CPU)
+- Modelo: Intel(R) Core(TM) Ultra 9 185H
+- Núcleos físicos: 16
+- Hilos lógicos (logical processors): 22
+- Frecuencia máxima: 2500 MHz
+- Caché L2: 18432 KB
+- Caché L3: 24576 KB
+- Socket: U3E1
+
+MEMORIA RAM
+- Memoria física total: 33811898368 bytes (~31.49 GB)
+- Capacidad y configuración: 32 GB 
+
+TARJETAS GRÁFICAS (GPU)
+- NVIDIA GeForce RTX 4070 Laptop GPU
+  - Memoria reportada por WMI (AdapterRAM): 4293918720 bytes (~4 GB)
+- Intel(R) Arc(TM) Graphics
+  - Memoria reportada por WMI (AdapterRAM): 2147479552 bytes (~2 GB)
+
