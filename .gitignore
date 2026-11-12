@@ -11,5 +11,4 @@ data/img_*.png
 
 # Salidas en PGM (se conservan las versiones PNG)
 
-
 __pycache__/
