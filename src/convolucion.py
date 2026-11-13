@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import os
 from pathlib import Path
 import tempfile
+import time
 
 import numpy as np
 
@@ -24,28 +25,48 @@ def crear_mascara(filtro: str, k: int) -> np.ndarray:
     raise ValueError(f"Filtro desconocido: {filtro}")
 
 
-def convolucion_cpu(entrada: np.ndarray, mascara: np.ndarray) -> np.ndarray:
-    """Referencia NumPy con extensión de ceros y acumulación float32."""
+class TiempoSecuencialExcedido(RuntimeError):
+    """La convolución secuencial superó el límite documentado."""
+
+    def __init__(self, segundos: float):
+        super().__init__(f"límite de {segundos:g} s excedido")
+        self.segundos = segundos
+
+
+def convolucion_secuencial(entrada: np.ndarray, mascara: np.ndarray,
+                           limite_segundos: float | None = None) -> np.ndarray:
+    """Convolución Python secuencial mediante recorridos explícitos.
+
+    NumPy se usa únicamente para almacenar datos. El cálculo recorre píxeles y
+    coeficientes sin vectorización, JIT, multiprocesamiento ni filtros externos.
+    """
     entrada = np.ascontiguousarray(entrada, dtype=np.float32)
-    mascara = np.asarray(mascara, dtype=np.float32)
+    mascara = np.ascontiguousarray(mascara, dtype=np.float32)
     alto, ancho = entrada.shape
     k = mascara.shape[0]
     r = k // 2
     salida = np.zeros_like(entrada)
-    for i in range(k):
-        dy = i - r
-        y0, y1 = max(0, -dy), min(alto, alto - dy)
-        if y1 <= y0:
-            continue
-        for j in range(k):
-            dx = j - r
-            x0, x1 = max(0, -dx), min(ancho, ancho - dx)
-            if x1 <= x0:
-                continue
-            salida[y0:y1, x0:x1] += (
-                entrada[y0 + dy:y1 + dy, x0 + dx:x1 + dx] * mascara[i, j]
-            )
+    inicio = time.perf_counter()
+    for fila in range(alto):
+        if limite_segundos is not None and time.perf_counter() - inicio > limite_segundos:
+            raise TiempoSecuencialExcedido(limite_segundos)
+        for col in range(ancho):
+            suma = np.float32(0.0)
+            for i in range(k):
+                y = fila + i - r
+                if y < 0 or y >= alto:
+                    continue
+                for j in range(k):
+                    x = col + j - r
+                    if x < 0 or x >= ancho:
+                        continue
+                    producto = np.float32(entrada[y, x] * mascara[i, j])
+                    suma = np.float32(suma + producto)
+            salida[fila, col] = suma
     return salida
+
+
+convolucion_cpu = convolucion_secuencial
 
 
 @dataclass
@@ -83,6 +104,7 @@ class ConvolucionGPU:
     """Compila el kernel y reutiliza las reservas de memoria del dispositivo."""
 
     def __init__(self, ancho: int, alto: int, k: int):
+        inicio_contexto = time.perf_counter()
         _preparar_compilador_windows()
         import pycuda.autoinit  # noqa: F401 - crea y destruye el contexto CUDA
         import pycuda.driver as cuda
@@ -91,12 +113,16 @@ class ConvolucionGPU:
         self.cuda = cuda
         self.ancho, self.alto, self.k = ancho, alto, k
         self.nbytes = ancho * alto * np.dtype(np.float32).itemsize
-        self.d_entrada = cuda.mem_alloc(self.nbytes)
-        self.d_salida = cuda.mem_alloc(self.nbytes)
-        self.d_mascara = cuda.mem_alloc(k * k * np.dtype(np.float32).itemsize)
         cache = Path(tempfile.gettempdir()) / "pycuda-computo-paralelo-cache"
         cache.mkdir(parents=True, exist_ok=True)
         self.kernel = SourceModule(KERNEL, cache_dir=str(cache)).get_function("convolucion")
+        self.t_contexto_compilacion_ms = (time.perf_counter() - inicio_contexto) * 1000
+
+        inicio_reserva = time.perf_counter()
+        self.d_entrada = cuda.mem_alloc(self.nbytes)
+        self.d_salida = cuda.mem_alloc(self.nbytes)
+        self.d_mascara = cuda.mem_alloc(k * k * np.dtype(np.float32).itemsize)
+        self.t_reserva_ms = (time.perf_counter() - inicio_reserva) * 1000
 
     def ejecutar(self, entrada: np.ndarray, mascara: np.ndarray, hilos: int):
         cuda = self.cuda

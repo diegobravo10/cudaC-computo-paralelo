@@ -1,0 +1,6 @@
+filtro,ancho,alto,k,hilos_por_bloque,error_max,error_medio,tolerancia,resultado
+media,256,170,3,256,3.05176e-05,2.98763e-06,0.001,OK
+nitidez,256,170,3,256,0,0,0.001,OK
+laplaciano,256,170,3,256,0,0,0.001,OK
+media,256,170,9,256,6.10352e-05,3.60552e-06,0.001,OK
+media,256,170,21,256,3.05176e-05,2.29287e-06,0.001,OK

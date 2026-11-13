@@ -1,0 +1,5 @@
+Entrada común: entrada_comun.pgm (256x170)
+Repeticiones: 5
+Hilos: 256
+Calentamiento: 1 C++/Python y 3 CUDA C/PyCUDA.
+Validaciones antes del recorte: C++ vs CUDA C y Python secuencial vs PyCUDA.

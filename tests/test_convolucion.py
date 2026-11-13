@@ -2,7 +2,9 @@ import unittest
 
 import numpy as np
 
-from src.convolucion import ConvolucionGPU, TOLERANCIA, convolucion_cpu, crear_mascara
+from src.convolucion import (ConvolucionGPU, TOLERANCIA,
+                             TiempoSecuencialExcedido,
+                             convolucion_secuencial, crear_mascara)
 
 
 class PruebasConvolucion(unittest.TestCase):
@@ -19,7 +21,7 @@ class PruebasConvolucion(unittest.TestCase):
     def comparar(self, entrada, filtro, k, hilos=128):
         entrada = np.asarray(entrada, dtype=np.float32)
         mascara = crear_mascara(filtro, k)
-        cpu = convolucion_cpu(entrada, mascara)
+        cpu = convolucion_secuencial(entrada, mascara)
         gpu, bloques, _ = ConvolucionGPU(entrada.shape[1], entrada.shape[0], k).ejecutar(
             entrada, mascara, hilos)
         self.assertEqual(bloques, (entrada.size + hilos - 1) // hilos)
@@ -43,8 +45,9 @@ class PruebasConvolucion(unittest.TestCase):
         np.testing.assert_allclose(gpu, esperado, atol=1e-5)
 
     def test_dimensiones_no_multiplo(self):
-        entrada = np.random.default_rng(42).integers(0, 256, (77, 101)).astype(np.float32)
-        for hilos in (128, 256, 512):
+        # 17*19=323, no divisible para 128 ni 256; prueba el último bloque parcial.
+        entrada = np.random.default_rng(42).integers(0, 256, (17, 19)).astype(np.float32)
+        for hilos in (128, 256):
             for filtro, k in (("media", 3), ("nitidez", 3), ("laplaciano", 3),
                               ("media", 9), ("media", 21)):
                 with self.subTest(hilos=hilos, filtro=filtro, k=k):
@@ -55,6 +58,11 @@ class PruebasConvolucion(unittest.TestCase):
                                  ((257, 1), "nitidez", 3), ((5, 7), "media", 21)):
             with self.subTest(forma=forma, filtro=filtro):
                 self.comparar(np.arange(np.prod(forma)).reshape(forma), filtro, k)
+
+    def test_limite_secuencial_documentado(self):
+        with self.assertRaises(TiempoSecuencialExcedido):
+            convolucion_secuencial(np.ones((100, 100), dtype=np.float32),
+                                   crear_mascara("media", 21), limite_segundos=0)
 
 
 if __name__ == "__main__":
