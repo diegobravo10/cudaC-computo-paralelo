@@ -1,0 +1,30 @@
+prueba,configuracion,detalle,valor,tolerancia,resultado
+matriz_manual,laplaciano_3x3,error_max=0.000e+00; error_medio=0.000e+00,0.0,1e-05,OK
+matriz_manual,nitidez_3x3,error_max=0.000e+00; error_medio=0.000e+00,0.0,1e-05,OK
+dimensiones_no_multiplo,17x19_media_3x3_hilos128,bloques=3/3; error_max=1.526e-05; error_medio=2.504e-06; cpu_float32_vs_gpu_float32,1.52587890625e-05,0.0001,OK
+dimensiones_no_multiplo,17x19_media_9x9_hilos128,bloques=3/3; error_max=3.052e-05; error_medio=3.956e-06; cpu_float32_vs_gpu_float32,3.0517578125e-05,0.0001,OK
+dimensiones_no_multiplo,17x19_media_21x21_hilos128,bloques=3/3; error_max=7.629e-06; error_medio=1.783e-06; cpu_float32_vs_gpu_float32,7.62939453125e-06,0.0001,OK
+dimensiones_no_multiplo,17x19_nitidez_3x3_hilos128,bloques=3/3; error_max=0.000e+00; error_medio=0.000e+00; cpu_float32_vs_gpu_float32,0.0,0.0001,OK
+dimensiones_no_multiplo,17x19_laplaciano_3x3_hilos128,bloques=3/3; error_max=0.000e+00; error_medio=0.000e+00; cpu_float32_vs_gpu_float32,0.0,0.0001,OK
+dimensiones_no_multiplo,17x19_media_3x3_hilos256,bloques=2/2; error_max=1.526e-05; error_medio=2.504e-06; cpu_float32_vs_gpu_float32,1.52587890625e-05,0.0001,OK
+dimensiones_no_multiplo,17x19_media_9x9_hilos256,bloques=2/2; error_max=3.052e-05; error_medio=3.956e-06; cpu_float32_vs_gpu_float32,3.0517578125e-05,0.0001,OK
+dimensiones_no_multiplo,17x19_media_21x21_hilos256,bloques=2/2; error_max=7.629e-06; error_medio=1.783e-06; cpu_float32_vs_gpu_float32,7.62939453125e-06,0.0001,OK
+dimensiones_no_multiplo,17x19_nitidez_3x3_hilos256,bloques=2/2; error_max=0.000e+00; error_medio=0.000e+00; cpu_float32_vs_gpu_float32,0.0,0.0001,OK
+dimensiones_no_multiplo,17x19_laplaciano_3x3_hilos256,bloques=2/2; error_max=0.000e+00; error_medio=0.000e+00; cpu_float32_vs_gpu_float32,0.0,0.0001,OK
+directo_vs_servicio,media_3x3,error_max=0.000e+00; error_medio=0.000e+00; antes_de_uint8,0.0,1e-05,OK
+directo_vs_servicio,media_9x9,error_max=0.000e+00; error_medio=0.000e+00; antes_de_uint8,0.0,1e-05,OK
+directo_vs_servicio,media_21x21,error_max=0.000e+00; error_medio=0.000e+00; antes_de_uint8,0.0,1e-05,OK
+directo_vs_servicio,nitidez_3x3,error_max=0.000e+00; error_medio=0.000e+00; antes_de_uint8,0.0,1e-05,OK
+directo_vs_servicio,laplaciano_3x3,error_max=0.000e+00; error_medio=0.000e+00; antes_de_uint8,0.0,1e-05,OK
+entrada_invalida,archivo_no_imagen,HTTP=400; esperado=400; mensaje=la cabecera no corresponde a una imagen soportada; 4.6 ms,400,400,OK
+entrada_invalida,archivo_tamano,HTTP=413; esperado=413; mensaje=el archivo supera 128 MiB; 997.5 ms,413,413,OK
+entrada_invalida,filtro_desconocido,"HTTP=422; esperado=422; mensaje=filtro 'desconocido' no permitido; use media, nitidez o laplaciano; 15.8 ms",422,422,OK
+entrada_invalida,mascara_no_permitida,"HTTP=422; esperado=422; mensaje=máscara 7 no permitida para 'media'; use [3, 9, 21]; 4.9 ms",422,422,OK
+entrada_invalida,mascara_laplaciano,HTTP=422; esperado=422; mensaje=máscara 9 no permitida para 'laplaciano'; use [3]; 3.9 ms,422,422,OK
+recuperacion,health_tras_errores,servicio responde 200 tras entradas inválidas,True,True,OK
+aislamiento,cliente_A,error_max=0.000e+00; error_medio=0.000e+00,0.0,1e-05,OK
+aislamiento,cliente_B,error_max=0.000e+00; error_medio=0.000e+00,0.0,1e-05,OK
+aislamiento,sin_sobrescritura,cada cliente recibió su propia imagen,True,True,OK
+cola,30_solicitudes_media_21x21,"429=9; códigos=[200, 429]; 13983.0 ms",9,>=1,OK
+recuperacion,health_tras_concurrencia,servicio responde 200 tras saturar la cola,True,True,OK
+evidencia_visual,galeria_filtros,/app/results/visual/galeria_filtros.png,original + 5 configuraciones,mismo recorte,OK

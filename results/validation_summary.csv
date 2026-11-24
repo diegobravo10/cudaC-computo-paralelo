@@ -1,0 +1,9 @@
+prueba,total,ok,fallos
+aislamiento,3,3,0
+cola,1,1,0
+dimensiones_no_multiplo,10,10,0
+directo_vs_servicio,5,5,0
+entrada_invalida,5,5,0
+evidencia_visual,1,1,0
+matriz_manual,2,2,0
+recuperacion,2,2,0

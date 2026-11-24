@@ -1,0 +1,67 @@
+{
+  "environment": "local",
+  "source_commit": "75fad23a526ff9dccea92040764e127e03751cb3",
+  "git_commit": "75fad23a526ff9dccea92040764e127e03751cb3",
+  "sistema": {
+    "plataforma": "Windows-11-10.0.26200-SP0",
+    "procesador": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel",
+    "cpu_logicas": 16,
+    "python": "3.14.0 (tags/v3.14.0:ebf955d, Oct  7 2025, 10:15:03) [MSC v.1944 64 bit (AMD64)]"
+  },
+  "paquetes": {
+    "numpy": "2.4.2",
+    "Pillow": "12.1.0",
+    "pycuda": "2026.1",
+    "fastapi": "0.137.2",
+    "uvicorn": "0.49.0",
+    "requests": "2.32.5"
+  },
+  "nvidia_smi": "0, NVIDIA GeForce RTX 4070 Laptop GPU, 617.42, 8188, 1006, 6943",
+  "configuracion": {
+    "max_upload_mb": 128,
+    "max_pixels": 36000000,
+    "max_side": 8192,
+    "queue_maxsize": 8,
+    "result_ttl_seconds": 900,
+    "threads_per_block": 256,
+    "gpu_headroom_mb": 256,
+    "cuda_cache_dir": "C:\\Users\\ariel\\AppData\\Local\\Temp\\pycuda-computo-paralelo-cache"
+  },
+  "base_url": "http://127.0.0.1:8000",
+  "repeticiones_estables": 5,
+  "calentamientos": 1,
+  "hilos_solicitados": 256,
+  "resoluciones": [
+    2000,
+    4000,
+    6000
+  ],
+  "configuraciones": [
+    [
+      "media",
+      3
+    ],
+    [
+      "media",
+      9
+    ],
+    [
+      "media",
+      21
+    ],
+    [
+      "nitidez",
+      3
+    ],
+    [
+      "laplaciano",
+      3
+    ]
+  ],
+  "niveles_concurrencia": [
+    1,
+    2,
+    4,
+    8
+  ]
+}
