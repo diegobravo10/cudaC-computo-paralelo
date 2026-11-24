@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Convolución GPU · Práctica 03</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <main class="contenedor">
+    <header>
+      <div>
+        <h1>Convolución de imágenes con PyCUDA</h1>
+        <p>Práctica 03 · kernels propios de la Práctica 02 ejecutados en GPU dentro de Docker</p>
+      </div>
+      <span id="estado-salud" class="badge">Consultando GPU…</span>
+    </header>
+
+    <section class="panel">
+      <form id="formulario">
+        <div class="campo">
+          <label for="imagen">Imagen de entrada</label>
+          <input id="imagen" name="file" type="file" accept="image/png,image/jpeg,image/bmp,image/tiff,image/webp,image/x-portable-graymap,.pgm,.png,.jpg,.jpeg" required>
+          <small>Se valida la cabecera real, el tamaño y las dimensiones en el servidor.</small>
+        </div>
+
+        <div class="fila">
+          <div class="campo">
+            <label for="filtro">Filtro</label>
+            <select id="filtro" name="filter">
+              <option value="media">Media</option>
+              <option value="nitidez">Nitidez</option>
+              <option value="laplaciano">Laplaciano</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label for="mascara">Tamaño de máscara</label>
+            <select id="mascara" name="mask_size" disabled>
+              <option value="3">3 × 3</option>
+              <option value="9" selected>9 × 9</option>
+              <option value="21">21 × 21</option>
+            </select>
+            <small>Solo disponible para Media; Nitidez y Laplaciano usan 3 × 3.</small>
+          </div>
+
+          <div class="campo">
+            <label for="hilos">Hilos por bloque</label>
+            <select id="hilos" name="threads_per_block">
+              <option value="128">128</option>
+              <option value="256" selected>256</option>
+              <option value="512">512</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="enviar" type="submit">
+          <span id="icono-envio" class="spinner" hidden></span>
+          <span id="texto-envio">Procesar en GPU</span>
+        </button>
+        <div id="progreso" class="progreso" hidden>Procesando… evite enviar otra solicitud.</div>
+      </form>
+    </section>
+
+    <div id="alerta" class="alerta" role="alert" hidden></div>
+
+    <section class="panel" id="resultados" hidden>
+      <h2>Resultado</h2>
+      <p class="solicitud">request_id: <code id="request-id"></code></p>
+      <div class="comparativa">
+        <figure>
+          <img id="original" alt="Imagen original">
+          <figcaption>Original</figcaption>
+        </figure>
+        <figure>
+          <img id="procesada" alt="Imagen procesada">
+          <figcaption>Procesada en GPU</figcaption>
+        </figure>
+      </div>
+      <div class="acciones">
+        <a id="descargar" class="boton" download>Descargar PNG</a>
+        <a id="crudo" class="boton secundario" href="#" download>Descargar float32</a>
+      </div>
+
+      <h3>Desglose de tiempos</h3>
+      <table>
+        <thead><tr><th>Etapa</th><th>Alcance</th><th>Valor</th></tr></thead>
+        <tbody>
+          <tr><td>Espera en cola</td><td>Servidor, antes de GPU</td><td id="t-cola"></td></tr>
+          <tr><td>Preparación CPU</td><td>Decodificación y máscara</td><td id="t-prep"></td></tr>
+          <tr><td>Reserva + H2D</td><td>CPU → GPU, eventos CUDA</td><td id="t-h2d"></td></tr>
+          <tr><td>Kernel</td><td>Ejecución CUDA, eventos</td><td id="t-kernel"></td></tr>
+          <tr><td>D2H</td><td>GPU → CPU, eventos CUDA</td><td id="t-d2h"></td></tr>
+          <tr><td>Postproceso</td><td>Codificación PNG y escritura</td><td id="t-post"></td></tr>
+          <tr><td>Total servidor</td><td>Desde recepción hasta respuesta</td><td id="t-total"></td></tr>
+        </tbody>
+      </table>
+      <p id="arranque" class="arranque"></p>
+    </section>
+  </main>
+
+  <script src="/static/app.js" defer></script>
+</body>
+</html>

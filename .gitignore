@@ -10,7 +10,6 @@ bin/
 
 
 __pycache__/
-results/
 *.f32
 .env
 graphify-out/
