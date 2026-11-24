@@ -17,9 +17,37 @@ api/          FastAPI, validación, cola de GPU y almacén de resultados
 web/static/   index.html, styles.css y app.js
 experiments/  validate_suite.py y run_benchmarks.py
 data/         imágenes de entrada 2000², 4000², 6000²
-results/      artefactos generados (ignorado por Git)
+results/      artefactos generados (versionados en esta rama; excluidos del contexto Docker)
 tests/        pruebas numéricas de la Práctica 02
 scripts/      scripts originales de la Práctica 02
+```
+
+## Datos de entrada y reproducibilidad
+
+Las seis imágenes ya están incluidas en `data/` junto con el original `data/arbol.jpg` y `data/preparacion.txt`, así que no hace falta generarlas para repetir los experimentos. Si se quieren regenerar, desde la raíz del repositorio:
+
+```powershell
+py scripts\preparar_imagenes.py data\arbol.jpg
+```
+
+El script convierte a escala de grises, toma el recorte central cuadrado `(0, 23, 6426, 6449)`, redimensiona con LANCZOS a `2000²`, `4000²` y `6000²`, guarda cada tamaño en `.pgm` y `.png`, y reescribe `data/preparacion.txt`. El original `data/arbol.jpg` tiene SHA-256 `1965cce3796da6a59f36338b95cd5f0069d3e7512cf4cd7b0659ffb4cda890f8`.
+
+Estos son los SHA-256 de referencia de las entradas, copiados de `results/image_hashes.csv`:
+
+| Archivo | Dimensiones | Bytes | SHA-256 |
+|---|---:|---:|---|
+| `img_2000.pgm` | 2000×2000 | 4000017 | `45a0c9a2529cbc091310f813775ec872ca9ceed367b17625631794bac904bd3c` |
+| `img_2000.png` | 2000×2000 | 1948955 | `773a061955dc9f2c1ce33a4a38ea2c777b52c03a68846b4604eb86690dd46720` |
+| `img_4000.pgm` | 4000×4000 | 16000017 | `4bdc05319bc75ec5ab50c903351c1fe4f0ba25cf83a6527a4aa2c572d9087148` |
+| `img_4000.png` | 4000×4000 | 6286399 | `58fcf7d937e73dff9cf7fa3c95df66b0bfa7ffcacfd504452cba9931e5e5ca9f` |
+| `img_6000.pgm` | 6000×6000 | 36000017 | `12db532f2123fd8fc143753dfba21487870f8c63a03644f55c9e8a260a66a3f5` |
+| `img_6000.png` | 6000×6000 | 12655105 | `0d977a878c3f4e1b52377af8274ebdf692d3333cdd17cab0c15d4203d05eb6a0` |
+
+Para verificar una copia local:
+
+```powershell
+Get-FileHash -Algorithm SHA256 data\img_2000.pgm, data\img_2000.png, data\img_4000.pgm, data\img_4000.png, data\img_6000.pgm, data\img_6000.png |
+  ForEach-Object { "{0} {1}" -f (Split-Path $_.Path -Leaf), $_.Hash.ToLowerInvariant() }
 ```
 
 ## Requisitos
@@ -47,7 +75,7 @@ docker image inspect computo-paralelo-p3:latest --format '{{.Id}} {{.Created}} {
 # Si el nombre ya existe:
 docker rm -f convolucion-pycuda
 
-docker run --rm --gpus all --name convolucion-pycuda -p 8000:8000 `
+docker run --gpus all --name convolucion-pycuda -p 8000:8000 `
   -e APP_QUEUE_MAXSIZE=8 -e APP_RESULT_TTL_SECONDS=900 `
   computo-paralelo-p3:latest
 ```
@@ -86,16 +114,9 @@ Frontend: `http://127.0.0.1:8000/`. Documentación OpenAPI: `http://127.0.0.1:80
 | Método | Ruta | Descripción |
 |---|---|---|
 | `GET` | `/` | Interfaz web. |
-| `POST` | `/api/convolve` | Acepta `file`, `filter`, `mask_size` y `threads_per_block` (`128`, `256`, `512`). Devuelve URLs `.png` y `.f32`, `request_id`, par?metros, m?tricas e informaci?n de GPU. |
+| `POST` | `/api/convolve` | Acepta `file`, `filter`, `mask_size` y `threads_per_block` (`128`, `256`, `512`). Devuelve URLs `.png` y `.f32`, `request_id`, parámetros, métricas e información de GPU. |
 | `GET` | `/api/health` | Estado, GPU, cola, límites, commit y versiones. |
 | `GET` | `/api/results/{nombre}` | Descarga del resultado `.png` o `.f32`. |
-
-Ejemplo:
-
-```powershell
-curl.exe -Method Post -Uri http://127.0.0.1:8000/api/convolve `
-  -Form file=@data/256x170.jpg -Form filter=media -Form mask_size=9 -Form threads_per_block=256
-```
 
 Errores:
 
@@ -103,7 +124,7 @@ Errores:
 |---|---|
 | `400` | Cabecera no soportada o imagen corrupta. |
 | `413` | Archivo, lado o número de píxeles excedido. |
-| `422` | Filtro, m?scara o `threads_per_block` inv?lido (`threads_per_block` permitido: `128`, `256`, `512`). |
+| `422` | Filtro, máscara o `threads_per_block` inválido (`threads_per_block` permitido: `128`, `256`, `512`). |
 | `429` | Cola de GPU llena; reintente con backoff. |
 | `503` | GPU/contexto/kernel no disponible. |
 | `507` | Memoria de GPU insuficiente. |
@@ -183,21 +204,5 @@ py scripts\comparar_cuatro_versiones.py --entrada data\imagen_pequena.pgm --reps
 
 ## Despliegue
 
-Modalidad prevista: **local** con GPU NVIDIA RTX 4070 Laptop accesible desde Docker Desktop/WSL2. La guía admite esta alternativa cuando no hay créditos o infraestructura de nube; el informe debe documentar esa limitación, el anfitrión, el acceso desde un cliente distinto cuando la red lo permita y las evidencias de `docker logs`, `docker stats`, `nvidia-smi` y `/api/health`.
+Modalidad prevista: **local** con cualquier GPU NVIDIA compatible con CUDA 12.4 (driver ≥ 550 y memoria suficiente; el código toma el primer dispositivo visible, `cuda.Device(0)`, sin exigir un modelo concreto). Las mediciones de este informe se tomaron en una RTX 4070 Laptop accesible desde Docker Desktop/WSL2; ese modelo no es un requisito. La guía admite la modalidad local cuando no hay créditos o infraestructura de nube, y Cloudflare Tunnel permite publicar el servicio sin abrir puertos ni desplegar en un proveedor cloud: con el contenedor corriendo, ejecuta `cloudflared tunnel --url http://127.0.0.1:8000`. Es una URL temporal `https://*.trycloudflare.com` que solo funciona mientras el contenedor y el túnel estén activos; la API no tiene autenticación, así que no compartas la URL públicamente.
 
-## Checklist para el informe
-
-Completar estos datos antes de entregar; el repositorio no los inventa:
-
-| Apartado | Evidencia a adjuntar |
-|---|---|
-| Despliegue local o en nube | Justificación; proveedor/región/instancia si aplica; captura de `docker run`. |
-| Inventario | CPU, RAM, GPU, SO, driver, Docker, Python, PyCUDA, CUDA, puertos y cliente distinto. |
-| Build limpio | ID de imagen, imagen base, versiones fijas y commit desde `environment.json`. |
-| Pruebas | `validation_summary.csv`, capturas de `/api/health` y respuestas `429`/`503`/`507`. |
-| Rendimiento | `summary_table.md`, `benchmark_results.csv` y comentario sobre mediana/IQR/desviación. |
-| Visual | `results/visual/galeria_filtros.png` con original y los cinco filtros. |
-| Recursos | `docker stats`, `nvidia-smi`, fecha/hora de apagado o borrado de instancia. |
-| Firmas | Nombre, código y firma de cada integrante. |
-
-> Los directorios `results/` y `graphify-out/` están ignorados por Git. Copie las evidencias seleccionadas a la carpeta de entregable del grupo antes de hacer commit.
