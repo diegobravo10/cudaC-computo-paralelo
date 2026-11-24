@@ -123,7 +123,7 @@ def main():
     p=argparse.ArgumentParser()
     p.add_argument("--entrada",required=True,type=Path,help="imagen pequeña común")
     p.add_argument("--cuda-c-dir",type=Path,default=CUDA_C_PREDET)
-    p.add_argument("--resultados",type=Path,default=RAIZ/"resultados_comparacion_cuatro")
+    p.add_argument("--resultados",type=Path,default=RAIZ/"results"/"comparacion_cuatro")
     p.add_argument("--reps",type=int,default=5)
     p.add_argument("--hilos",type=int,default=256)
     p.add_argument("--limite-secuencial",type=float,default=300)

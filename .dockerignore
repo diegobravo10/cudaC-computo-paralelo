@@ -12,9 +12,6 @@ venv
 *.log
 *.pdf
 results/
-resultados_Ariel/
-resultados_Diego/
-resultados_comparacion_cuatro/
 bin/
 .DS_Store
 Thumbs.db
